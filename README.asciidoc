@@ -1,0 +1,62 @@
+Six/one-router
+==============
+Javier Ubillos <jav@sics.se>
+:Author Initials: JU
+
+
+
+Six/one-router
+--------------
+An (unfinished) article can be found here: https://github.com/jav/six-one-router/blob/master/article/main.pdf?raw=true
+
+[NOTE]
+This prototype was developed and tested on FreeBSD 6.2
+
+
+A technical overview
+~~~~~~~~~~~~~~~~~~~
+The amount of entries in the global routing tables grows exponentially.
+One way of addressing this problem, is to divide the address name-space into two. 
+
+- One name-space for the Internet core
+* Globally addressable
+* Administratively assigned
+* Each core-router is addressed
+- One name-space for the edge networks
+* Locally managed addresses
+* An edge network has _one_ prefix, independently of how it is connected upstream
+
+This way, if a host in an edge network wants to reach another host, in
+a different edge network it only needs to address that host by it's
+known IP. When the packet reaches the border router, the router does a
+look up "which way do I take to reach edge network XYZ?" and sends the
+packet in that direction. Upon reception, the address are
+restored. This greatly improves our ability to aggregate addresses (as opposed to the address-block fragmentation we are facing today).
+
+We achieve:
+
+- End to end addressing
+- Routing scalability (multi-homed network does not need to spam the Internet with multiple routes)
+- The possibility for an entire edge-network to multi-home and/or to be mobile
+
+We divide IP-addresses (IPv6) into two halves, the routing prefix and the host-identity. (8 + 8 bytes).
+
+To maintain checksum integrity, we use two bytes for checksum compensation.
+An address is parsed as follows
+......................................
+
+bytes  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+       Routing  prefix |      |    Host identifier
+                       checksum
+                     compensation
+......................................
+
+e.g. 
+.........
+ABC::1
+.........
+is equivalent to
+.........
+1000:0:0:F9BB::1
+........
+
