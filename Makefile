@@ -4,8 +4,9 @@ LIBS=-lpcap
 GCC_OPTS=-ggdb
 DEFS=-DDBG
 
-main: list.o queue.o debug_pktheaders.o sixonetypes.o sixonelib.o main.o
-	gcc ${GCC_OPTS} ${DEFS} ${LIBS} -pthread list.o queue.o debug_pktheaders.o sixonetypes.o sixonelib.o main.o -o sixone
+main: list.o debug_pktheaders.o sixonetypes.o sixonelib.o main.o
+	gcc ${GCC_OPTS} ${DEFS} ${LIBS} -pthread list.o debug_pktheaders.o sixonetypes.o sixonelib.o main.o -o sixone
+	#gcc ${GCC_OPTS} ${DEFS} ${LIBS} -pthread list.o queue.o debug_pktheaders.o sixonetypes.o sixonelib.o main.o -o sixone
 
 main.o: main.c
 	gcc ${GCC_OPTS} ${DEFS} -c main.c
@@ -19,8 +20,8 @@ sixonetypes.o: sixonelib/sixonetypes.c
 debug_pktheaders.o: sixonelib/debug_pktheaders.c
 	gcc ${GCC_OPTS} ${DEFS} -c sixonelib/debug_pktheaders.c
 
-queue.o: sixonelib/queue/queue.c
-	gcc ${GCC_OPTS} ${DEFS} -c sixonelib/queue/queue.c
+#queue.o: sixonelib/queue/queue.c
+#	gcc ${GCC_OPTS} ${DEFS} -c sixonelib/queue/queue.c
 
 list.o: sixonelib/queue/list.c
 	gcc ${GCC_OPTS} ${DEFS} -c sixonelib/queue/list.c
