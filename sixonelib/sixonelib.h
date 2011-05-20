@@ -1,3 +1,29 @@
+/* Copyright (c) 2008, Swedish Institute of Computer Science.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the <organization> nor the
+ *       names of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /** @file sixonelib/sixonelib.h
  *  @brief Six-One Router library
  *  @author Javier Ubillos
@@ -299,14 +325,18 @@ int recalc_udp_checksum(struct ip6_hdr *ip);
 
 u_int16_t checksum(u_int16_t sum, const void *_p, u_int16_t len);
 
-
+/**
+ *  @brief Calculates the checksum difference when rewriting IP-addresses. Compensates for the difference by writing the difference into the 7th byte.
+ *  @param target A pointer to the (IPv6) field to write to
+ *  @param prev A pointer to the (IPv6) field to read from
+ */
 void cksumNeutralIp( struct in6_addr *target, struct in6_addr *prev );
 
 u_int16_t getCksumDiff16(void* a, void* b);
 
 u_int16_t incksum16(const void *_p);
 
-void packet_too_big (struct ip6_hdr *ip);
+void packet_too_big(struct ip6_hdr *ip);
 
 #endif
 
