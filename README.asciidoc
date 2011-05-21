@@ -10,6 +10,9 @@ Six/one-router
 An (unfinished) article can be found here: https://github.com/jav/six-one-router/blob/master/article/main.pdf?raw=true
 
 [NOTE]
+All features described in the article are _not_ implemented in the prototype (yet)
+
+[NOTE]
 This prototype was developed and tested on FreeBSD 6.2
 
 
