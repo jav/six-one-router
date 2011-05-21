@@ -4,8 +4,10 @@ LIBS=-lpcap
 GCC_OPTS=-ggdb
 DEFS=-DDBG
 INC=-Iinclude
+OBJDIR=bin
 
 main: debug_pktheaders.o sixonetypes.o sixonelib.o main.o
+	mkdir -p $(OBJDIR)
 	gcc ${GCC_OPTS} ${DEFS} ${LIBS} ${INC} -pthread debug_pktheaders.o sixonetypes.o sixonelib.o main.o -o bin/sixone
 
 main.o: src/main.c
