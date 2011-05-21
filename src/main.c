@@ -38,7 +38,7 @@
 
 #include <pcap.h>
 
-#include "sixonelib/sixonelib.h"
+#include "sixonelib.h"
 
 /// @brief DBG enable/disable debug output (should be an #ifdef really)
 #define DBG 1
