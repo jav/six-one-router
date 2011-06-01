@@ -23,4 +23,4 @@ debug_pktheaders.o: src/debug_pktheaders.c
 	gcc ${GCC_OPTS} ${DEFS} ${INC} -c src/debug_pktheaders.c
 
 clean:
-	rm -rf bin/*.o bin/sixone
+	rm -rf bin/*.o bin/sixone *.o
