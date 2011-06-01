@@ -518,10 +518,10 @@ void inbound(struct ip6_hdr *ip)
 		new->pfx = 64;
 		assert(new != 0);
 
-		print_ip_header(ip);
+		print_ip_header((u_char *)ip);
 		write_prefix(&ip->ip6_dst, new);
     
-		print_ip_header(ip);
+		print_ip_header((u_char *)ip);
 
 		cksumB = get_icmp6_checksum(ip);
 
@@ -555,7 +555,7 @@ void outbound(struct ip6_hdr *ip)
 	if( is_sixone((sixone_ip){&ip->ip6_dst , 128}) ) {
 
 		// resolve to transit dest
-		list = retrieve_mappings(((sixone_ip){&ip->ip6_dst, 128}), 0);
+		list = retrieve_mappings((sixone_ip)((sixone_ip){&ip->ip6_dst, 128}), 0);
 		ip_dst = policy_pick_dst(list);
 
 		/// @todo More intelligent interface selection and/or policy based.
@@ -621,7 +621,7 @@ void outbound(struct ip6_hdr *ip)
 
 		assert(new != 0);
 
-		write_prefix(&ip->ip6_src, &new->ip); //printf("\n");
+		write_prefix(&ip->ip6_src, (sixone_ip)&new->ip); //printf("\n");
 
 		cksumNeutralIp( &ip->ip6_src, &old->ip);
     
@@ -681,7 +681,7 @@ void forward_packet(struct ip6_hdr *ip)
 	//print_ip_header(ip);
 	//print_icmp_header( (struct icmp6_hdr *) (ip + 1) );
 
-	print_ip_header(ip);
+	print_ip_header((u_char *)ip);
 
 	if( sizeof(*ip) + ip->ip6_plen > maxbytes) maxbytes = sizeof(*ip) + ip->ip6_plen;
 	DBG_P("Want to write %d bytes, max so far is %d\n", sizeof(*ip) + ip->ip6_plen, maxbytes);
@@ -868,15 +868,15 @@ void write_prefix(struct in6_addr *addr, sixone_ip prefix)
 	inet_ntop( AF_INET6, &ipbuffer_prefix, dbg_pre, INET6_ADDRSTRLEN );
 	//DBG_P("pre: %s\n", dbg_pre);
 
-	extract_prefix(&ipbuffer_prefix, prefix->pfx, 128);
+	extract_prefix((u_char *)&ipbuffer_prefix, prefix->pfx, 128);
 	inet_ntop( AF_INET6, &ipbuffer_prefix, dbg_post, INET6_ADDRSTRLEN );
 	//DBG_P("pre: %s\n", dbg_pre);
   
-	extract_postfix(addr, prefix->pfx, 128);
+	extract_postfix((u_char *)addr, (u_int)prefix->pfx, 128);
 	inet_ntop( AF_INET6, addr , dbg_post, INET6_ADDRSTRLEN );
 	//DBG_P("post: %s\n", dbg_post);
 
-	or_arrays(addr, &ipbuffer_prefix, 16);
+	or_arrays((u_char *)addr, (u_char *)&ipbuffer_prefix, 16);
 	inet_ntop( AF_INET6, addr , dbg_post, INET6_ADDRSTRLEN );
 	//DBG_P("result: %s\n", dbg_post);
 	return;
@@ -991,7 +991,7 @@ ip_list retrieve_mappings_default(sixone_ip ip, u_int only_sixone)
 		inet_pton(AF_INET6, strTran, &(tran_ip));
 
 		if( 0 == cmp_bits(&ip->ip, &edge_ip, pfx_len)) {
-			(*curr) = alloc_ip_list();
+			(*curr) = (ip_list)alloc_ip_list();
 			(*curr)->ip = alloc_sixone_ip();
 			(*curr)->ip->ip = tran_ip;
 			(*curr)->ip->pfx = pfx_len;
@@ -999,7 +999,7 @@ ip_list retrieve_mappings_default(sixone_ip ip, u_int only_sixone)
 		}
    
 		if( 0 == cmp_bits(&ip->ip, &tran_ip, pfx_len)) {
-			(*curr) = alloc_ip_list();
+			(*curr) = (ip_list)alloc_ip_list();
 			(*curr)->ip = alloc_sixone_ip();
 			(*curr)->ip->ip = edge_ip;
 			(*curr)->ip->pfx = pfx_len;
@@ -1210,10 +1210,10 @@ checksum(u_int16_t sum, const void *_p, u_int16_t len)
 
 void cksumNeutralIp( struct in6_addr *target, struct in6_addr *prev )
 {
-	u_int16_t * p = target;
+	u_int16_t *p = (u_int16_t *)target;
 	u_int16_t osum, nsum, oldWord;
-	u_int16_t* oaddr = prev;
-	u_int16_t* naddr = target;
+	u_int16_t *oaddr = (u_int16_t *)prev;
+	u_int16_t *naddr = (u_int16_t *)target;
 
 	char dbg_ipa[INET6_ADDRSTRLEN], dbg_ipb[INET6_ADDRSTRLEN];
 	inet_ntop(AF_INET6, target, dbg_ipa, sizeof(dbg_ipa));
