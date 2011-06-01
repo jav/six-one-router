@@ -170,19 +170,20 @@ void* print_icmp_header(u_char *packet)
   return (void*) ( packet + sizeof(struct icmp6_hdr) );
 }
 
-void* print_128_bits(void* data)
+void print_128_bits(void* data)
 {
 
-  int i;
-  for (i = 0; i < 15; i++)
-    printf("%.2X:", ((u_char*)data)[i]);
-  printf("%.2X\n", ((u_char*)data)[i]);
+	int i;
+	for (i = 0; i < 15; i++)
+		printf("%.2X:", ((u_char*)data)[i]);
 
+	printf("%.2X\n", ((u_char*)data)[i]);
+	
   
-  return;
+	return;
 }
 
-void* print_bytes_n(void* data, u_int n)
+void print_bytes_n(void* data, u_int n)
 {
   int i,j;
   int rowlen = 8;

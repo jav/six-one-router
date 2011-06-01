@@ -36,6 +36,7 @@
 #include <sys/socket.h> // required by ip6.h
 #include <netinet/in.h> // required by ip6.h
 #include <netinet/ip6.h>
+#include <arpa/inet.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -283,22 +284,22 @@ u_int load_settings(u_char* file, sixone_settings settings)
 
 	    _net->edge = ( 'E' == toupper(*_str) );
 	    
-	    _str = strchr(_str, '=') +1;
+	    _str = (u_char *)strchr(_str, '=') +1;
 
 		    
 	    // is it an edge net?
 	    if(_net->edge) { 
 
-	      sscanf(_str, "%s %d\n", _ip, &_net->addr->pfx);
-	      inet_pton(AF_INET6, _ip, &_net->addr->ip);
+			sscanf((const char *)_str, "%s %d\n", _ip, &_net->addr->pfx);
+	      inet_pton(AF_INET6, (char const *)_ip, &_net->addr->ip);
 	      _net->gw = NULL;
 	      //DBG_P("%s:%d net : edge (%s)/(%d)\n", __FILE__, __LINE__, _ip, _net->addr->pfx);
 	    }
 	    else {
-	      sscanf(_str, "%s %d %s", _ip, &_net->addr->pfx, _gw);
-	      inet_pton(AF_INET6, _ip, &_net->addr->ip);
+			sscanf((const char *)_str, "%s %d %s", _ip, &_net->addr->pfx, _gw);
+			inet_pton(AF_INET6, (char const *)_ip, &_net->addr->ip);
 	      _net->gw = malloc(sizeof(struct in6_addr ));
-	      inet_pton(AF_INET6, _gw, _net->gw);
+	      inet_pton(AF_INET6, (char const *)_gw, _net->gw);
 	      //DBG_P("%s:%d net : transit (%s)/(%d) -> %s\n", __FILE__, __LINE__, _ip, _net->addr->pfx, _gw);
 	    }
 
@@ -316,5 +317,5 @@ u_int load_settings(u_char* file, sixone_settings settings)
   //persistent storage
  
 
-  return;
+  return 0;
 }

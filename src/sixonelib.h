@@ -93,7 +93,7 @@ int set_filter(pcap_t *handle, sixone_if dev);
  *  @param dev The sixone_if to start
  *  @callergraph
  */
-void* start_interface(void* args);
+void start_interface(void* args);
 
 /**
  *  @brief Takes an address and zeroes out the "post prefix" part. That is, extracts the network part of the address

@@ -73,9 +73,9 @@ void* print_icmp_header(u_char *packet);
  *  @param data Pointer to the memory to print
  */
 
-void* print_128_bits(void* data);
+void print_128_bits(void* data);
 
-void* print_bytes_n(void* data, u_int n);
+void print_bytes_n(void* data, u_int n);
 
 void print_binary_char( u_char* data);
 

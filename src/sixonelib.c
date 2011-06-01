@@ -196,7 +196,7 @@ void sixone_stop_out_if()
 	//  system(cmd);
 }
 
-void* start_interface(void* args)
+void start_interface(void* args)
 {
 	pcap_t *handle;
 	u_char** set_n_if = ((u_char**) args);
