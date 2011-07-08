@@ -42,8 +42,7 @@ typedef struct sixone_settings_ *sixone_settings;
 
 /// @brief Sixone ip's usually need to know the prefixlength
 typedef struct sixone_ip_ *sixone_ip;
-struct sixone_ip_
-{
+struct sixone_ip_ {
 	struct in6_addr ip;
 	int pfx;
 };
@@ -51,16 +50,14 @@ struct sixone_ip_
 /// @brief Sixone usualy deals with pairs of ip's.
 /// OBSOLETE! 
 /// @deprecated
-typedef struct sixone_ip_pair_
-{
+typedef struct sixone_ip_pair_ {
 	sixone_ip a;
 	sixone_ip b;
 } *ip_pair;
 
 /// @brief A list of ips and their pfx_len
 typedef struct ip_list_ *ip_list; // mention the type for the next pointer
-struct ip_list_
-{
+struct ip_list_ {
 	sixone_ip ip;
 	ip_list next; /// The next ip in the list, NULL = end of list;
 };
@@ -104,8 +101,7 @@ typedef struct sixone_resolv_ {
 /**
  * @brief struct storing network and prefix length
  */
-typedef struct sixone_net_
-{
+typedef struct sixone_net_ {
 	sixone_ip addr;
 	short int edge;
 	struct in6_addr *gw;
@@ -114,8 +110,7 @@ typedef struct sixone_net_
 /**
  * @brief struct storing interfaces
  */
-typedef struct sixone_if_
-{
+typedef struct sixone_if_ {
 	u_int net_c;
 	u_char* if_name;
 	sixone_net *net_v;
@@ -125,8 +120,7 @@ typedef struct sixone_if_
 /**
  * @brief Struct keeping routers interfaces settings
  */
-struct sixone_settings_
-{
+struct sixone_settings_ {
 	u_int if_c;
 	sixone_if *if_v;
 	sixone_policy policy;
