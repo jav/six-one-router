@@ -118,9 +118,14 @@ void* print_ip_header(u_char *packet)
 	printf("| len:         %16d | %15s |    % 8hd |\n", ip->ip6_plen, ip_type, ip->ip6_hlim);
 	printf("| src:            %41s     |\n", src);
 	printf("| dst:            %41s     |\n", dst);
-	if(0 >= strlen(src)); printf("src: "); print_128_bits(&ip->ip6_src);printf("\n");
-	if(0 >= strlen(dst)); printf("dst: "); print_128_bits(&ip->ip6_dst);printf("\n");
-
+	if(0 >= strlen(src)) {
+		printf("src: "); 
+		print_128_bits(&ip->ip6_src);printf("\n");
+	}
+	if(0 >= strlen(dst)) { 
+		printf("dst: "); 
+		print_128_bits(&ip->ip6_dst);printf("\n");
+	}
 	return (void*) ( packet + sizeof(struct ip6_hdr) );
 }
 
