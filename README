@@ -15,6 +15,13 @@ All features described in the article are _not_ implemented in the prototype (ye
 [NOTE]
 This prototype was developed and tested on FreeBSD 6.2
 
+Browsing the code
+~~~~~~~~~~~~~~~~~~~
+To get to the call-flow:
+main() calls start_sixone()
+for each in-interface, start_interface() is started
+start_interface() registers a BPFilter, on a match got_packet() is called
+All the cool processing is done in/from got_packet() (no more function pointers, just a straight call-path)
 
 A technical overview
 ~~~~~~~~~~~~~~~~~~~
