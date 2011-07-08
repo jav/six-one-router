@@ -305,11 +305,6 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	return;
 }
 
-/**
- *  @brief Prepare and apply filtering rules for the capture
- *  @param handle The handle to the capturing session
- *  @param dev 
- */
 /// @TODO Abstract, encapsulate and beautify the parsing and filter-generation, this hould be a 10 lines function, not 100 lines.
 int set_filter(pcap_t *handle, sixone_if dev)
 {
@@ -805,7 +800,7 @@ u_int is_outbound(struct ip6_hdr *ip)
 	for (i = 0; i < global_settings->if_c; ++i)    {
 		dev = global_settings->if_v[i];
     
-		for(j = 0; j < dev->net_c; ++j){
+		for(j = 0; j < dev->net_c; ++j) {
 			if(dev->net_v[j]->edge) {
 				// is dst an edgenet?
 				inet_ntop( AF_INET6, &ip->ip6_dst , str_ip, INET6_ADDRSTRLEN );
@@ -972,7 +967,7 @@ ip_list retrieve_mappings_default(sixone_ip ip, u_int only_sixone)
 		exit (1);
 	}
 
-	while( NULL != fgets(_string, sizeof(_string), _fh) )      {
+	while( NULL != fgets(_string, sizeof(_string), _fh) ) {
 		sscanf(_string, "%[^/ ]/%d%s\n", strEdge,&pfx_len, strTran);
 		
 		inet_pton(AF_INET6, strEdge, &(edge_ip));

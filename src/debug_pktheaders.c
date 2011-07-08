@@ -183,8 +183,8 @@ void print_bytes_n(void* data, u_int n)
 	int rowlen = 8;
 	int rows = n / rowlen +1;
 	
-	for (i = 0; i < rows; i++){
-		for(j = 0; j < rowlen; j++ ){
+	for (i = 0; i < rows; i++) {
+		for(j = 0; j < rowlen; j++ ) {
 			printf( "%.2X", (((u_char*)(data))[j+i*rowlen])  );
 			j < (rowlen-1) ? printf(":"):printf("\n");
 		}
