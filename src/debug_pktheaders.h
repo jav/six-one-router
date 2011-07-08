@@ -24,7 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file sixonelib/debug_pktheaders.h
+/** @file debug_pktheaders.h
  *  @brief Debug functions for packet headers
  *  @author Javier Ubillos
  *  @date 2008-07-11
@@ -59,7 +59,6 @@ void* print_eth_header(const u_char *packet);
  * @param packet a pointer to the binary data
  */
 
-
 void* print_ip_header(u_char *packet);
 
 /**
@@ -75,14 +74,27 @@ void* print_icmp_header(u_char *packet);
 
 void print_128_bits(void* data);
 
+/**
+ *  @brief Print an arbitrary long array of bytes as HEX (stdout)
+ *  @param data Pointer to the memory to print
+ *  @param n Length (number of bytes to print)
+ */
+
 void print_bytes_n(void* data, u_int n);
+
+/**
+ *  @brief Print a single byte (char) as 8 bits (stdout)
+ *  @param data Pointer to the memory to print
+ */
 
 void print_binary_char( u_char* data);
 
+/**
+ *  @brief Print a char as 8 bits (stdout)
+ *  @param data Pointer to the memory to print
+ */
 void print_binary( u_char* data, int len);
 
-
-//void* print_ip_list(ip_list list);
 
 #endif
 

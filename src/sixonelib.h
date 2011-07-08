@@ -24,7 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file sixonelib/sixonelib.h
+/** @file sixonelib.h
  *  @brief Six-One Router library
  *  @author Javier Ubillos
  *  @date 2008-08-04
@@ -45,7 +45,7 @@ sixone_settings global_settings;
 
 
 /**
- *  @brief Start the sixone router with the given settings
+ *  @brief Start the sixone router with the given settings, starts a subthread for each interface.
  *  @param settings The settings to load (assumed to be loaded by load_settings()
  *  @return (not yet defined)
  *  @callergraph
@@ -61,6 +61,7 @@ int sixone_start_out_if();
 
 /**
  *  @brief Bring down the outgoing interface (destroy)
+ *  @TODO Add code
  */
 void sixone_stop_out_if();
 
@@ -117,14 +118,14 @@ void inbound(struct ip6_hdr *ip);
 void outbound(struct ip6_hdr *ip);
 
 /**
- *  @brief Send the packet
+ *  @brief Send the packet (all processing is done)
  *  @param ip packet to send.
  *  @callergraph
  */ 
 void forward_packet(struct ip6_hdr *ip);
 
 /**
- *  @brief Compares two bitstrings
+ *  @brief Compares two bitstrings of arbitrary bit-length, used for e.g. longest-prefix macthing
  *  @param left First bitstring to compare
  *  @param right Second bitstring to compare
  *  @param amount of bits to compare
@@ -316,11 +317,11 @@ u_int route_exists(sixone_ip ip);
 
 
 u_int16_t get_icmp6_checksum(struct ip6_hdr *ip);
-
+/// @deprecated
 int recalc_icmp6_checksum(struct ip6_hdr *ip);
-
+/// @deprecated
 int recalc_tcp_checksum(struct ip6_hdr *ip);
-
+/// @deprecated
 int recalc_udp_checksum(struct ip6_hdr *ip);
 
 u_int16_t checksum(u_int16_t sum, const void *_p, u_int16_t len);

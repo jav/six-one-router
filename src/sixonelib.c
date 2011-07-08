@@ -26,7 +26,7 @@
 
 
 
-/** @file sixonelib/sixonelib.c
+/** @file sixonelib.c
  *  @brief Six-One Router library
  *  @author Javier Ubillos
  *  @date 2008-08-06
@@ -89,8 +89,6 @@
 /// @brief set IP version (currently only supporting 6)
 #define IP 6
 
-
-
 char sixone_errbuf[PCAP_ERRBUF_SIZE];
 pcap_t **sixone_pcap_handles;
 u_int sixone_pcap_handles_count;
@@ -112,18 +110,16 @@ u_int start_sixone(sixone_settings settings)
 	DBG_P(" : START start_sixone()\n" );
 
 	global_settings = settings;
-
 	print_settings(global_settings);
-
 	sixone_packet_count = 0;
 
 	global_settings->out_fd = sixone_start_out_if();
 	atexit(&sixone_stop_out_if);
 
-	// you shouldn't run start_sixone twice, if you do, there'll be memory leaks
+	// you shouldn't run start_sixone twice, if you do, there'll be memory leaks!
 	sixone_threads_count = global_settings->if_c; 
 	sixone_threads = malloc( sixone_threads_count * sizeof(pthread_t));
-	if(NULL == sixone_threads)    {
+	if(NULL == sixone_threads) {
 		printf("could not malloc(%d) (sixone_pthreads)\n", sixone_threads_count * sizeof(pthread_t));
 		exit(1);
 	}
@@ -133,8 +129,7 @@ u_int start_sixone(sixone_settings settings)
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-	for( i=0; i < global_settings->if_c; i++)
-	{
+	for( i=0; i < global_settings->if_c; i++) {
 		printf("Starting %s\n", global_settings->if_v[i]->if_name);
 
 		set_n_if = (u_char**) malloc(sizeof(sixone_settings) + sizeof(sixone_if));
@@ -149,8 +144,7 @@ u_int start_sixone(sixone_settings settings)
 
 	}
 
-	for( i=0; i < global_settings->if_c; i++)
-	{
+	for( i=0; i < global_settings->if_c; i++) {
 		DBG_P(" : start_sixone() : (main thread waiting for children) pthread_join(%s)\n", global_settings->if_v[i]->if_name);
 		pthread_join(sixone_threads[i], NULL);
 	}
@@ -177,11 +171,13 @@ int sixone_start_out_if()
 
 	if(ioctl(fd, TUNSIFHEAD, &tunhead) < 0)
 		err(1, "ioctl - TUNSIFHEAD");
-
+	
 	if (fstat(fd, &buf) < 0)
 		err(1, "stat");
+
 	devname_r(buf.st_rdev, buf.st_mode & S_IFMT, tunif, sizeof(tunif));
   
+	// This should be possible to do with netlink sockets, but this required less reading.
 	snprintf(cmd, sizeof(cmd), "ifconfig %s inet6 10::1 10::2 prefixlen 128 up", tunif);
 	system(cmd);
 	DBG_P(" : sixone_start_out_if() : %s opened fd:%d \n",cmd, fd);
@@ -204,7 +200,6 @@ void start_interface(void* args)
 	sixone_if _dev = (sixone_if)set_n_if[1];
 
 	DBG_P("threadid:%d\n",_dev->if_name, (int)pthread_self());
-
 	DBG_P("starting: %s\n", _dev->if_name );
   
 	// setup the device
@@ -226,6 +221,8 @@ void start_interface(void* args)
 	pthread_exit(NULL);
 }
 
+
+/// @TODO: Fix destroy mutexes
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
 	pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -273,17 +270,15 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		//pthread_mutex_destroy(&_mutex);
 		//DBG_P("MUTEX DESTROY\n");
 		return;
-  
 	}
       
-
 	print_eth_header((void*)eth_hdr);
 	DBG_P(" incoming packet:\n");
 	print_ip_header((void*)ip);
 	//  print_icmp_header((void*)icmp);
-
    
 	printf("[%d] \n", sixone_packet_count);
+
 	if(is_inbound(ip)) {
 		DBG_P("inbound!\n");
 		inbound(ip);
@@ -315,7 +310,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
  *  @param handle The handle to the capturing session
  *  @param dev 
  */
-
+/// @TODO Abstract, encapsulate and beautify the parsing and filter-generation, this hould be a 10 lines function, not 100 lines.
 int set_filter(pcap_t *handle, sixone_if dev)
 {
 	int i,j,k,l;
@@ -468,7 +463,6 @@ void inbound(struct ip6_hdr *ip)
 	DBG_P(" <------ \n");
 
 	// resolve to source edge
-
 	if( bilateral_bit(ip) ) {
 
 		// If you wish to add the remote net to some 'is-upgraded' database
@@ -549,11 +543,9 @@ void outbound(struct ip6_hdr *ip)
   
 	DBG_P(" ------> \n");
 
-
 	// first check if the target is upgraded or not
 	// YES, target is upgraded
 	if( is_sixone((sixone_ip){&ip->ip6_dst , 128}) ) {
-
 		// resolve to transit dest
 		list = retrieve_mappings((sixone_ip)((sixone_ip){&ip->ip6_dst, 128}), 0);
 		ip_dst = policy_pick_dst(list);
@@ -600,10 +592,8 @@ void outbound(struct ip6_hdr *ip)
 		// setup a nat rule
 		// packet must have passed through, so just ignore
 		DBG_P("rewrite source() Legacy target (nxt:%hd)\n", ip->ip6_nxt);
-
 		cksumA = get_icmp6_checksum(ip);
 		DBG_P("cksumA = get_icmp6_checksum(ip) : %hX\n", cksumA);
-		//print_binary(&cksumA, 2); printf("\n");
 
 		old = alloc_sixone_ip();
 
@@ -944,16 +934,14 @@ sixone_ip policy_pick_dst_default(ip_list list)
 {
 	DBG_P("list: %p\n", list);
 	if (list == NULL) return NULL;
-	else
-		return list->ip;
+	else return list->ip;
 }
 
 sixone_ip policy_pick_src_default(ip_list list)
 {
 	DBG_P("\n");
 	if (list == NULL) return NULL;
-	else
-		return list->ip;
+	else return list->ip;
 }
 
 ip_list retrieve_mappings_default(sixone_ip ip, u_int only_sixone)
@@ -986,10 +974,10 @@ ip_list retrieve_mappings_default(sixone_ip ip, u_int only_sixone)
 
 	while( NULL != fgets(_string, sizeof(_string), _fh) )      {
 		sscanf(_string, "%[^/ ]/%d%s\n", strEdge,&pfx_len, strTran);
-
+		
 		inet_pton(AF_INET6, strEdge, &(edge_ip));
 		inet_pton(AF_INET6, strTran, &(tran_ip));
-
+		
 		if( 0 == cmp_bits(&ip->ip, &edge_ip, pfx_len)) {
 			(*curr) = (ip_list)alloc_ip_list();
 			(*curr)->ip = alloc_sixone_ip();
@@ -1053,8 +1041,6 @@ int add_route(struct in6_addr * ip, u_int pfx, struct in6_addr* gw)
 	inet_ntop(AF_INET6, ip, ip_str, sizeof(ip_str));
 	inet_ntop(AF_INET6, gw, gw_str, sizeof(gw_str));
 
-	//DBG_P("ip_str: %s/%d -> %s\n", ip_str, pfx, gw_str);
-	//  sprintf(cmd, "route add -inet6  %s/%d  -iface %s", ip_str, pfx, dev);	
 	sprintf(cmd, "route add -inet6  %s/%d  %s", ip_str, pfx, gw_str);	
 
 	for(i = 0; i<cmdListLen; i++) {
@@ -1071,7 +1057,6 @@ int add_route(struct in6_addr * ip, u_int pfx, struct in6_addr* gw)
 	cmdList[cmdListLen] = cmdListElement;
 	cmdListLen++;
 	DBG_P("ADDING NEW ROUTE\n");
-	//DBG_P("cmd: %s\n", cmd);
 	return system(cmd);
   
 }
@@ -1086,24 +1071,6 @@ void del_route(sixone_ip ip, sixone_if dev)
 u_int route_exists(sixone_ip ip)
 {
 	return 0;
-/*
-	u_char* cmd = "netstat -nr";
-  
-	FILE *fpipe;
-
-	char line[256];
-  
-	if ( !(fpipe = (FILE*)popen(cmd,"r")) ) {  // If fpipe is NULL
-		perror("Problems with pipe");
-		exit(1);
-	}
-  
-	while ( fgets( line, sizeof line, fpipe)) {
-		printf("%s", line);
-	}
-
-	pclose(fpipe);
-*/
 }
 
 /// @deprecated
@@ -1231,7 +1198,7 @@ void cksumNeutralIp( struct in6_addr *target, struct in6_addr *prev )
  
 	naddr[3] += nsum;
   
-	if( naddr[3] < oldWord)
+	if( naddr[3] < oldWord )
 		naddr[3]++;
 
 	//DBG_P("() : old_p[3]:%hX => p[3]:%hX \n", oldWord, naddr[3]);
@@ -1254,7 +1221,7 @@ u_int16_t getCksumDiff16(void* a, void* b) {
 }
 
 /**
- * Internet checksum in network byte order.
+ * @brief Internet checksum in network byte order.
  */
 u_int16_t incksum16(const void *_p) {
 
@@ -1302,6 +1269,5 @@ void packet_too_big(struct ip6_hdr *ip) {
 	ip->ip6_plen = SIXONE_MTU - sizeof(struct ip6_hdr);
 
 	// reply to the sender
-	forward_packet(ip);
- 
+	forward_packet(ip); 
 }

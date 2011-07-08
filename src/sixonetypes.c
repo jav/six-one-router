@@ -24,7 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** @file sixonelib/sixonetypes.c
+/** @file sixonetypes.c
  *  @brief Six-One Router Types
  *  @author Javier Ubillos
  *  @date 2008-08-06
