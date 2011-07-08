@@ -113,6 +113,7 @@ u_int start_sixone(sixone_settings settings)
 	print_settings(global_settings);
 	sixone_packet_count = 0;
 
+	// Init out interface
 	global_settings->out_fd = sixone_start_out_if();
 	atexit(&sixone_stop_out_if);
 
@@ -129,6 +130,7 @@ u_int start_sixone(sixone_settings settings)
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
+	// For each in-interface, start a thread
 	for( i=0; i < global_settings->if_c; i++) {
 		printf("Starting %s\n", global_settings->if_v[i]->if_name);
 
@@ -144,6 +146,8 @@ u_int start_sixone(sixone_settings settings)
 
 	}
 
+	// For each interface/thread, wait until it has finished.
+	// TODO: Is this the correct way to wait for multiple threads?
 	for( i=0; i < global_settings->if_c; i++) {
 		DBG_P(" : start_sixone() : (main thread waiting for children) pthread_join(%s)\n", global_settings->if_v[i]->if_name);
 		pthread_join(sixone_threads[i], NULL);
@@ -231,13 +235,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	struct ip6_hdr *ip = (struct ip6_hdr *) (eth_hdr + 1); // +1 ethernet header length
 	struct icmp6_hdr *icmp = (struct icmp6_hdr *) (ip + 1); // +1 ip header length
 	u_char** set_n_if = (u_char**) args;
-	u_int quit = 0;
 	sixone_if _dev = (sixone_if)set_n_if[1];
 
-	struct in6_addr dbg1;
-	struct in6_addr dbg2;
-	int h;
-  
 	u_char src_ip[INET6_ADDRSTRLEN];
 	u_char dst_ip[INET6_ADDRSTRLEN];
 
@@ -245,7 +244,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	pthread_mutex_lock( &_mutex );
 
 	DBG_P("%s:%d : [%s] Caught a packet! [%d]\n",_dev->if_name, ++sixone_packet_count);
-	++sixone_packet_count;
+	sixone_packet_count += 1;
 
 	DBG_P("IP->LEN = %d\n", ip->ip6_plen );
 	if( ip->ip6_plen > SIXONE_MTU) {
@@ -255,6 +254,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 		return;
 	}
 
+	// Ignore Neighborhood discovery messages, they'r being delivered to the router
+	// TODO: Sort out the filters so that messages to this specific router are not caught
 	switch(icmp->icmp6_type) {
 	case ND_ROUTER_SOLICIT:
 	case ND_ROUTER_ADVERT:

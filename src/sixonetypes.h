@@ -44,8 +44,8 @@ typedef struct sixone_settings_ *sixone_settings;
 typedef struct sixone_ip_ *sixone_ip;
 struct sixone_ip_
 {
-  struct in6_addr ip;
-  int pfx;
+	struct in6_addr ip;
+	int pfx;
 };
 
 /// @brief Sixone usualy deals with pairs of ip's.
@@ -53,16 +53,16 @@ struct sixone_ip_
 /// @deprecated
 typedef struct sixone_ip_pair_
 {
-  sixone_ip a;
-  sixone_ip b;
+	sixone_ip a;
+	sixone_ip b;
 } *ip_pair;
 
 /// @brief A list of ips and their pfx_len
 typedef struct ip_list_ *ip_list; // mention the type for the next pointer
 struct ip_list_
 {
-  sixone_ip ip;
-  ip_list next; /// The next ip in the list, NULL = end of list;
+	sixone_ip ip;
+	ip_list next; /// The next ip in the list, NULL = end of list;
 };
 
 /**
@@ -70,8 +70,8 @@ struct ip_list_
  * policy functions.
  */
 typedef struct sixone_policy_ {
-  sixone_ip (*sixone_policy_dst)(ip_list list);
-  sixone_ip (*sixone_policy_src)(ip_list list);
+	sixone_ip (*sixone_policy_dst)(ip_list list);
+	sixone_ip (*sixone_policy_src)(ip_list list);
 } *sixone_policy;
 
 /**
@@ -79,26 +79,26 @@ typedef struct sixone_policy_ {
  * resolution functions.
  */
 typedef struct sixone_resolv_ {
-  /**
-   * @brief get the mappings for a given destination
-   *  @arg ip The ip and prefix in an sixone_ip struct
-   *  @arg settings The "global" settings of the router
-   *  @return A list of mappings. No mappings => empty list
-   */
-  ip_list (*sixone_resolv)(sixone_ip ip, u_int only_sixone);
+	/**
+	 * @brief get the mappings for a given destination
+	 *  @arg ip The ip and prefix in an sixone_ip struct
+	 *  @arg settings The "global" settings of the router
+	 *  @return A list of mappings. No mappings => empty list
+	 */
+	ip_list (*sixone_resolv)(sixone_ip ip, u_int only_sixone);
 
-  /** 
-   * @brief resolve destination
-   *  @arg ip An edge ip
-   *  @return a set of transit ip's  
-   */
-  //ip_list (*sixone_resolv_dst)(struct in6_addr ip);
-  /** 
-   * @brief resolve source 
-   *  @arg ip An edge ip
-   *  @return a set of transit ip's  
-   */
-  //ip_list (*sixone_resolv_src)(struct in6_addr ip);
+	/** 
+	 * @brief resolve destination
+	 *  @arg ip An edge ip
+	 *  @return a set of transit ip's  
+	 */
+	//ip_list (*sixone_resolv_dst)(struct in6_addr ip);
+	/** 
+	 * @brief resolve source 
+	 *  @arg ip An edge ip
+	 *  @return a set of transit ip's  
+	 */
+	//ip_list (*sixone_resolv_src)(struct in6_addr ip);
 } *sixone_resolv;
 
 /**
@@ -106,9 +106,9 @@ typedef struct sixone_resolv_ {
  */
 typedef struct sixone_net_
 {
-  sixone_ip addr;
-  short int edge;
-  struct in6_addr *gw;
+	sixone_ip addr;
+	short int edge;
+	struct in6_addr *gw;
 } *sixone_net;
 
 /**
@@ -116,9 +116,9 @@ typedef struct sixone_net_
  */
 typedef struct sixone_if_
 {
-  u_int net_c;
-  u_char* if_name;
-  sixone_net *net_v;
+	u_int net_c;
+	u_char* if_name;
+	sixone_net *net_v;
   
 } *sixone_if;
 
@@ -127,11 +127,11 @@ typedef struct sixone_if_
  */
 struct sixone_settings_
 {
-  u_int if_c;
-  sixone_if *if_v;
-  sixone_policy policy;
-  sixone_resolv resolv;
-  int out_fd;
+	u_int if_c;
+	sixone_if *if_v;
+	sixone_policy policy;
+	sixone_resolv resolv;
+	int out_fd;
 };
 
 
@@ -241,6 +241,7 @@ void print_sixone_ip(sixone_ip addr);
  *  @brief Load SixOne configuration from file
  *  @param file absolute path of configuration file.
  *  comes in form of "var=val"
+ *  @param settings Struct to write settings to
  *  @code 
  *  edge_net=ABC::1
  *  edge_prefix=/64

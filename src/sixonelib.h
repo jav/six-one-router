@@ -43,14 +43,12 @@
 
 sixone_settings global_settings;
 
-
 /**
  *  @brief Start the sixone router with the given settings, starts a subthread for each interface.
- *  @param settings The settings to load (assumed to be loaded by load_settings()
+ *  @param settings The settings to use (assumed to be loaded by load_settings()
  *  @return (not yet defined)
  *  @callergraph
  */
-
 u_int start_sixone();
 
 /**
